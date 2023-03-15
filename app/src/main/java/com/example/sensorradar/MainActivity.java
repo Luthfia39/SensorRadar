@@ -9,6 +9,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
@@ -21,8 +22,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     private TextView mtextSensorPitch;
     private TextView mtextSensorRoll;
 
+    private ImageView mSpotTop;
+    private ImageView mSpotBottom;
+    private ImageView mSpotLeft;
+    private ImageView mSpotRight;
+
     private float[] mAccelerometerData = new float[3];
     private float[] mMagnetometerData = new float[3];
+
+//    batasan
+    private static final float VALUE_DRIFT = 0.05f;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +47,11 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
         mSensorAccelerator = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mSensorMagnetometer = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
+
+        mSpotTop = findViewById(R.id.spot_top);
+        mSpotBottom = findViewById(R.id.spot_bottom);
+        mSpotLeft = findViewById(R.id.spot_left);
+        mSpotRight = findViewById(R.id.spot_right);
     }
 
     @Override
@@ -87,6 +101,28 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
         mtextSensorAzimuth.setText(getResources().getString(R.string.value_format, azimuth));
         mtextSensorPitch.setText(getResources().getString(R.string.value_format, pitch));
         mtextSensorRoll.setText(getResources().getString(R.string.value_format, roll));
+
+        if (Math.abs(pitch) < VALUE_DRIFT){
+            pitch = 0;
+        }
+        if (Math.abs(roll) < VALUE_DRIFT){
+            roll = 0;
+        }
+        mSpotBottom.setAlpha(0.05f);
+        mSpotTop.setAlpha(0.05f);
+        mSpotLeft.setAlpha(0.05f);
+        mSpotRight.setAlpha(0.05f);
+
+        if (pitch > 0){
+            mSpotBottom.setAlpha(pitch);
+        }else{
+            mSpotTop.setAlpha(Math.abs(pitch));
+        }
+        if (roll > 0){
+            mSpotLeft.setAlpha(roll);
+        }else{
+            mSpotRight.setAlpha(Math.abs(roll));
+        }
     }
 
     @Override
